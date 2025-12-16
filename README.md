@@ -227,15 +227,6 @@ email-eu-graph-platform/
 
 ---
 
-##  System Requirements
-
-* CPU: Intel i5 or equivalent
-* RAM: 8 GB (sufficient)
-* OS: Linux / Windows / macOS
-
-This project is optimized for **small-to-medium graphs** and runs efficiently on personal machines.
-
----
 
 ##  Professional & Academic Value
 

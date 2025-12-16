@@ -1,0 +1,9 @@
+{
+  "train_size": 703,
+  "val_size": 151,
+  "test_size": 151,
+  "edge_train_size": 7000,
+  "edge_val_size": 1500,
+  "edge_test_size": 1500,
+  "random_state": 42
+}

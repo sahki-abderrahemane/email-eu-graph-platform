@@ -48,7 +48,7 @@ coverage/
 *.db
 
 # ML Models and Data
-*.pkl
+
 *.h5
 *.pt
 *.pth
@@ -71,10 +71,6 @@ Desktop.ini
 # Docker
 .dockerignore
 docker-compose.override.yml
-
-# Jupyter Notebooks
-.ipynb_checkpoints/
-*.ipynb
 
 # Python virtual environment
 env/

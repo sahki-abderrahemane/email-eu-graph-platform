@@ -1,0 +1,12 @@
+{
+  "best_model_name": "Random Forest",
+  "best_model_train_acc": 0.8577524893314367,
+  "best_model_val_acc": 0.26490066225165565,
+  "best_model_test_acc": 0.1986754966887417,
+  "num_features": 22,
+  "num_departments": 42,
+  "link_pred_train_acc": 0.9994285714285714,
+  "link_pred_val_acc": 0.9266666666666666,
+  "link_pred_test_acc": 0.9273333333333333,
+  "link_pred_roc_auc": 0.9732151111111111
+}

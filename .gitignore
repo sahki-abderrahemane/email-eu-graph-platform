@@ -1,0 +1,92 @@
+# Dependencies
+node_modules/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+.next/
+out/
+
+# Testing
+coverage/
+.nyc_output/
+*.lcov
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# ML Models and Data
+*.pkl
+*.h5
+*.pt
+*.pth
+*.onnx
+models/saved/
+data/processed/*.pkl
+data/processed/*.csv
+*.npy
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+.pytest_cache/
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Python virtual environment
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Package manager
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Misc
+.turbo/
+.vercel/

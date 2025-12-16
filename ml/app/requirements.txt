@@ -1,0 +1,32 @@
+# FastAPI & Server
+fastapi
+uvicorn[standard]
+pydantic
+python-dotenv
+python-multipart
+
+# Data Science & ML
+numpy
+pandas==2.0.3
+scikit-learn
+scipy
+
+# Graph Processing
+networkx
+node2vec
+igraph
+python-louvain
+# Community Detection (Leiden alternative to deprecated leidenalg)
+# cdlib
+
+# Graph Embeddings
+gensim
+karateclub
+
+# Visualization
+matplotlib
+seaborn
+
+# Utilities
+joblib
+tqdm

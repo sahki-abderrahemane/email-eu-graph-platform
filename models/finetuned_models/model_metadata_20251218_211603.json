@@ -1,0 +1,15 @@
+{
+    "timestamp": "20251218_211603",
+    "strategy": "L2-Normalized",
+    "test_f1": 0.7908304474480946,
+    "test_acc": 0.7905405405405406,
+    "baseline_f1": 0.7556449497625968,
+    "improvement": 4.656353184991466,
+    "hyperparameters": {
+        "C": 0.01,
+        "penalty": "l2",
+        "solver": "saga",
+        "max_iter": 500,
+        "class_weight_strategy": "tuned_custom_1.5x"
+    }
+}

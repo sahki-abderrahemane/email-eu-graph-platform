@@ -1,18 +1,18 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from utils.model_manager import model_manager
 
 router = APIRouter()
 
 @router.get("/metrics")
 async def get_metrics():
-    """Get graph analysis metrics"""
+    """Get live graph analysis metrics computed from data/email-Eu-core.csv"""
+    result = model_manager.get_graph_metrics()
+    
+    if "error" in result:
+        raise HTTPException(status_code=500, detail=result["error"])
+        
     return {
-        "nodes": 1005,
-        "edges": 25571,
-        "avg_degree": 50.89,
-        "avg_clustering": 0.399,
-        "diameter": 7,
-        "density": 0.0507,
-        "connected_components": 1,
+        **result,
         "departments": 42,
-        "message": "Graph metrics endpoint - placeholder response"
+        "message": "Graph metrics powered by NetworkX and live edge data"
     }

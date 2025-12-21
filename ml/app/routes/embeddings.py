@@ -1,6 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
+from utils.model_manager import model_manager
 
 router = APIRouter()
 
@@ -11,25 +12,23 @@ class EmbeddingRequest(BaseModel):
 
 @router.post("/generate")
 async def generate_embeddings(request: EmbeddingRequest):
-    """Generate Node2Vec embeddings"""
+    """Generate Node2Vec embeddings (NOT IMPLEMENTED - Use precomputed)"""
     return {
-        "status": "success",
-        "message": "Embeddings generated successfully",
-        "dimensions": request.dimensions,
-        "walk_length": request.walk_length,
-        "num_walks": request.num_walks,
-        "total_nodes": 1005
+        "status": "info",
+        "message": "Dynamic generation not supported yet. Using precomputed embeddings.",
+        "dimensions": request.dimensions
     }
 
 @router.get("/visualize")
-async def visualize_embeddings():
-    """Get UMAP/t-SNE visualization data"""
+async def visualize_embeddings(method: str = "pca"):
+    """Get PCA visualization data from precomputed embeddings"""
+    result = model_manager.get_embeddings_viz(method)
+    
+    if "error" in result:
+        raise HTTPException(status_code=500, detail=result["error"])
+        
     return {
         "status": "success",
-        "message": "Embeddings visualization endpoint",
-        "visualization_data": {
-            "method": "umap",
-            "dimensions": 2,
-            "points": []  # Placeholder for actual visualization points
-        }
+        "message": f"Embeddings visualized using {method}",
+        **result
     }

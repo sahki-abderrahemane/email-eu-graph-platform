@@ -1,6 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
+from utils.model_manager import model_manager
 
 router = APIRouter()
 
@@ -9,15 +10,13 @@ class CommunityRequest(BaseModel):
 
 @router.post("/detect")
 async def detect_communities(request: CommunityRequest):
-    """Detect communities in the graph"""
+    """Detect communities in the graph using specified algorithm"""
+    result = model_manager.detect_communities(request.method)
+    
+    if "error" in result:
+        raise HTTPException(status_code=500, detail=result["error"])
+        
     return {
-        "method": request.method,
-        "num_communities": 10,
-        "modularity": 0.65,
-        "communities": {
-            "0": [1, 5, 12, 45],
-            "1": [2, 8, 34, 67],
-            "2": [3, 9, 23, 78]
-        },
-        "message": f"Community detection using {request.method} - placeholder response"
+        **result,
+        "message": f"Community detection computed on live graph using {result['method']}"
     }

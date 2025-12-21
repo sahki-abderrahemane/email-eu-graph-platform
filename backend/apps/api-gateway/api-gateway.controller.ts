@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Inject } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, Query } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
@@ -54,7 +54,7 @@ export class ApiGatewayController {
 
   @Get('users/:id')
   async getUserById(@Param('id') id: string) {
-    return firstValueFrom(this.authClient.send('user.findOne', { id: +id }));
+    return firstValueFrom(this.authClient.send('user.findOne', { id }));
   }
 
   @Patch('users/:id')
@@ -63,18 +63,18 @@ export class ApiGatewayController {
     @Body() updateUserDto: { email?: string; name?: string; role?: string },
   ) {
     return firstValueFrom(
-      this.authClient.send('user.update', { id: +id, ...updateUserDto }),
+      this.authClient.send('user.update', { id, ...updateUserDto }),
     );
   }
 
   @Delete('users/:id')
   async deleteUser(@Param('id') id: string) {
-    return firstValueFrom(this.authClient.send('user.delete', { id: +id }));
+    return firstValueFrom(this.authClient.send('user.delete', { id }));
   }
 
   @Get('users/:id/profile')
   async getUserProfile(@Param('id') id: string) {
-    return firstValueFrom(this.authClient.send('user.profile', { id: +id }));
+    return firstValueFrom(this.authClient.send('user.profile', { id }));
   }
 
   // ============ GRAPH ENDPOINTS ============
@@ -111,6 +111,27 @@ export class ApiGatewayController {
   @Get('graph/centrality')
   async getCentrality() {
     return firstValueFrom(this.graphClient.send('graph.centrality', {}));
+  }
+
+  @Get('graph/activity')
+  async getRecentActivity() {
+    return firstValueFrom(this.graphClient.send('graph.activity', {}));
+  }
+
+  @Get('graph/prediction/history')
+  async getPredictionHistory(
+    @Query('userId') userId: string,
+    @Query('limit') limit?: number,
+    @Query('offset') offset?: number,
+  ) {
+    return firstValueFrom(
+      this.graphClient.send('graph.prediction.history', { userId, limit, offset }),
+    );
+  }
+
+  @Post('graph/prediction/save')
+  async savePrediction(@Body() data: any) {
+    return firstValueFrom(this.graphClient.send('graph.prediction.save', data));
   }
 
   // ============ VISUALIZATION ENDPOINTS ============
@@ -154,6 +175,22 @@ export class ApiGatewayController {
     return response.data;
   }
 
+  @Post('ml/predict/simulate')
+  async simulateDepartment(@Body() data: any) {
+    const response = await firstValueFrom(
+      this.httpService.post(`${this.mlServiceUrl}/predict/department/simulate`, data),
+    );
+    return response.data;
+  }
+
+  @Get('ml/predict/unseen')
+  async predictUnseen(@Query('index') index?: number) {
+    const response = await firstValueFrom(
+      this.httpService.get(`${this.mlServiceUrl}/predict/department/unseen`, { params: { index } }),
+    );
+    return response.data;
+  }
+
   @Post('ml/embeddings/generate')
   async generateEmbeddings(@Body() params?: any) {
     const response = await firstValueFrom(
@@ -163,9 +200,9 @@ export class ApiGatewayController {
   }
 
   @Get('ml/embeddings/visualize')
-  async visualizeEmbeddings() {
+  async visualizeEmbeddings(@Query('method') method?: string) {
     const response = await firstValueFrom(
-      this.httpService.get(`${this.mlServiceUrl}/embeddings/visualize`),
+      this.httpService.get(`${this.mlServiceUrl}/embeddings/visualize`, { params: { method: method || 'pca' } }),
     );
     return response.data;
   }
@@ -174,6 +211,14 @@ export class ApiGatewayController {
   async predictLinks(@Body() { source, target }: { source: number; target: number }) {
     const response = await firstValueFrom(
       this.httpService.post(`${this.mlServiceUrl}/links/predict`, { source, target }),
+    );
+    return response.data;
+  }
+
+  @Post('ml/links/simulate')
+  async simulateLink(@Body() data: any) {
+    const response = await firstValueFrom(
+      this.httpService.post(`${this.mlServiceUrl}/links/simulate`, data),
     );
     return response.data;
   }

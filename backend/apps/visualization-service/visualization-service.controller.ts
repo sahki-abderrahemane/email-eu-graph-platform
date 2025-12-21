@@ -6,7 +6,7 @@ import { UpdateVisualizationServiceDto } from './dto/update-visualization-servic
 
 @Controller()
 export class VisualizationServiceController {
-  constructor(private readonly visualizationServiceService: VisualizationServiceService) {}
+  constructor(private readonly visualizationServiceService: VisualizationServiceService) { }
 
   @MessagePattern('createVisualizationService')
   create(@Payload() createVisualizationServiceDto: CreateVisualizationServiceDto) {
@@ -21,6 +21,26 @@ export class VisualizationServiceController {
   @MessagePattern('findOneVisualizationService')
   findOne(@Payload() id: number) {
     return this.visualizationServiceService.findOne(id);
+  }
+
+  @MessagePattern('visualization.layout')
+  getGraphLayout() {
+    return this.visualizationServiceService.getGraphLayout();
+  }
+
+  @MessagePattern('visualization.filter')
+  filterGraph(@Payload() data: { departments: number[] }) {
+    return this.visualizationServiceService.filterGraph(data.departments);
+  }
+
+  @MessagePattern('visualization.export')
+  exportGraph(@Payload() data: { format: 'json' | 'csv' }) {
+    return this.visualizationServiceService.exportGraph(data.format);
+  }
+
+  @MessagePattern('visualization.communities')
+  getCommunities() {
+    return this.visualizationServiceService.getCommunities();
   }
 
   @MessagePattern('updateVisualizationService')

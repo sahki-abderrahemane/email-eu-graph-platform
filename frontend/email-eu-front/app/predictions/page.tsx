@@ -65,7 +65,7 @@ const styles = {
         borderRadius: '0.5rem',
         fontSize: '0.875rem',
         fontWeight: 500,
-        color: active ? 'white' : 'var(--text-secondary)',
+        color: active ? '#ffffff' : 'var(--text-secondary)',
         background: active ? 'var(--primary)' : 'transparent',
         border: 'none',
         cursor: 'pointer',
@@ -137,7 +137,7 @@ const styles = {
     },
     btnPrimary: (disabled: boolean) => ({
         background: 'linear-gradient(135deg, var(--primary) 0%, var(--accent-purple) 100%)',
-        color: 'white',
+        color: '#ffffff',
         border: 'none',
         borderRadius: '0.75rem',
         padding: '0.75rem 1.5rem',
@@ -151,11 +151,13 @@ const styles = {
         boxShadow: '0 4px 12px rgba(99, 102, 241, 0.2)',
     }),
     resultBox: (type: 'success' | 'warning' | 'neutral' | 'info') => ({
-        background: 'var(--bg-hover)',
+        background: 'var(--bg-card)',
         border: `1px solid var(--border-subtle)`,
-        borderRadius: '0.75rem',
-        padding: '1.5rem',
+        borderRadius: '1.25rem',
+        padding: '1.75rem',
         marginBottom: '1rem',
+        boxShadow: 'var(--shadow-premium)',
+        transition: 'all 0.3s ease',
     }),
     badge: (type: 'success' | 'warning' | 'info') => ({
         padding: '0.25rem 0.75rem',
@@ -443,7 +445,7 @@ export default function PredictionsPage() {
                                                         <span style={styles.badge('success')}>{departmentResult.confidence.toFixed(1)}% Confidence</span>
                                                     </div>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                                        <div style={{ width: 60, height: 60, borderRadius: 12, background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '1.25rem' }}>
+                                                        <div style={{ width: 60, height: 60, borderRadius: 12, background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffffff', fontWeight: 'bold', fontSize: '1.25rem' }}>
                                                             {departmentResult.predicted_department}
                                                         </div>
                                                         <div>
@@ -465,11 +467,11 @@ export default function PredictionsPage() {
                                                         </span>
                                                     </div>
                                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                                        <div style={{ padding: '0.75rem', background: 'var(--bg-hover)', borderRadius: '0.5rem' }}>
+                                                        <div style={{ padding: '0.75rem', background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-subtle)' }}>
                                                             <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Ground Truth</p>
                                                             <p style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--text-primary)' }}>Dept {unseenResult.actual_department}</p>
                                                         </div>
-                                                        <div style={{ padding: '0.75rem', background: 'var(--bg-hover)', borderRadius: '0.5rem' }}>
+                                                        <div style={{ padding: '0.75rem', background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-subtle)' }}>
                                                             <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Model Predicted</p>
                                                             <p style={{ fontSize: '1.125rem', fontWeight: 600, color: unseenResult.is_correct ? 'var(--color-success)' : 'var(--color-error)' }}>Dept {unseenResult.predicted_department}</p>
                                                         </div>
@@ -577,7 +579,7 @@ export default function PredictionsPage() {
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                                 {predictionHistory.length > 0 ? predictionHistory.map((item, i) => (
-                                    <div key={i} style={{ padding: '0.75rem', borderRadius: '0.75rem', background: 'var(--bg-hover)', borderLeft: `3px solid ${item.type === 'department' ? 'var(--primary)' : 'var(--accent-purple)'}` }}>
+                                    <div key={i} style={{ padding: '1rem', borderRadius: '1rem', background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderLeft: `4px solid ${item.type === 'department' ? 'var(--primary)' : 'var(--accent-purple)'}`, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
                                             <span style={{ fontSize: '0.75rem', fontWeight: 600, color: item.type === 'department' ? 'var(--primary)' : 'var(--accent-purple)' }}>{item.type.toUpperCase()}</span>
                                             <span style={{ fontSize: '0.625rem', color: 'var(--text-muted)' }}>{item.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>

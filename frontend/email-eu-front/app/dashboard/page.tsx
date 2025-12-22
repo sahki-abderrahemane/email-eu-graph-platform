@@ -80,8 +80,8 @@ const styles = {
     statCard: {
         background: 'var(--bg-card)',
         border: '1px solid var(--border-subtle)',
-        borderRadius: '1.25rem',
-        padding: '1.5rem',
+        borderRadius: '1.5rem',
+        padding: '1.75rem',
         position: 'relative' as const,
         overflow: 'hidden',
         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -202,10 +202,12 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '1rem',
-        background: 'var(--bg-hover)',
-        borderRadius: '0.75rem',
+        padding: '1.25rem',
+        background: 'var(--bg-card)',
+        borderRadius: '1rem',
         border: '1px solid var(--border-subtle)',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+        transition: 'all 0.3s ease',
     },
     activityLeft: {
         display: 'flex',
@@ -254,10 +256,11 @@ const styles = {
     miniStatCard: {
         background: 'var(--bg-card)',
         border: '1px solid var(--border-subtle)',
-        borderRadius: '1rem',
+        borderRadius: '1.25rem',
         padding: '1.5rem',
         textAlign: 'center' as const,
         boxShadow: 'var(--shadow-card)',
+        transition: 'transform 0.3s ease',
     },
     scatterContainer: {
         width: '100%',
@@ -417,7 +420,7 @@ export default function DashboardPage() {
 
     if (!mounted || authLoading || loading) {
         return (
-            <div style={{ minHeight: '100vh', background: '#0a0a0f', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div className="spinner" style={{ width: 48, height: 48, border: '4px solid rgba(99,102,241,0.3)', borderTopColor: '#6366f1', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
                 <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </div>
@@ -451,8 +454,8 @@ export default function DashboardPage() {
 
                 {/* Stats Grid */}
                 <div style={styles.statsGrid}>
-                    <StatCard icon={Users} label="Total Users" value={networkStats.nodes.toLocaleString()} trend="+12% this month" color="#6366f1" />
-                    <StatCard icon={Share2} label="Network Edges" value={networkStats.edges.toLocaleString()} trend="+5.4% growth" color="#22d3ee" />
+                    <StatCard icon={Users} label="Total Users" value={networkStats.nodes.toLocaleString()} color="#6366f1" />
+                    <StatCard icon={Share2} label="Network Edges" value={networkStats.edges.toLocaleString()} color="#22d3ee" />
                     <StatCard icon={Target} label="Departments" value={networkStats.departments} color="#a855f7" />
                     <StatCard icon={Activity} label="Avg Connectivity" value={(networkStats.avgDegree || 0).toFixed(2)} color="#10b981" />
                 </div>
@@ -629,6 +632,7 @@ export default function DashboardPage() {
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.6 + i * 0.1 }}
+                                whileHover={{ x: 5, background: 'var(--bg-hover)', borderLeft: '4px solid var(--primary)' }}
                                 style={styles.activityItem}
                             >
                                 <div style={styles.activityLeft}>

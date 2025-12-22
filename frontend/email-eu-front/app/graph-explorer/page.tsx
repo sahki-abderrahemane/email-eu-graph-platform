@@ -99,9 +99,27 @@ const styles = {
         transition: 'all 0.2s ease',
     },
     legend: { position: 'absolute' as const, bottom: '1.5rem', left: '1.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', padding: '1.25rem', borderRadius: '1rem', boxShadow: 'var(--shadow-premium)', opacity: 0.95 },
-    detailItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.875rem', background: 'var(--bg-hover)', borderRadius: '0.75rem', marginBottom: '0.75rem' },
+    detailItem: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '1rem',
+        background: 'var(--bg-card)',
+        borderRadius: '1rem',
+        marginBottom: '0.75rem',
+        border: '1px solid var(--border-subtle)',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+    },
     btnPrimary: { width: '100%', background: 'linear-gradient(135deg, var(--primary) 0%, var(--accent-purple) 100%)', color: 'white', border: 'none', borderRadius: '0.75rem', padding: '0.875rem 1.5rem', fontWeight: 600, cursor: 'pointer', marginTop: '1rem', transition: 'all 0.3s ease' },
-    statBox: { textAlign: 'center' as const, padding: '1rem', background: 'var(--bg-hover)', borderRadius: '0.75rem', flex: 1 }
+    statBox: {
+        textAlign: 'center' as const,
+        padding: '1.25rem 1rem',
+        background: 'var(--bg-card)',
+        borderRadius: '1rem',
+        flex: 1,
+        border: '1px solid var(--border-subtle)',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+    }
 };
 
 export default function GraphExplorerPage() {
@@ -123,6 +141,23 @@ export default function GraphExplorerPage() {
     const [edges, setEdges] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showEdges, setShowEdges] = useState(true);
+    const [containerDimensions, setContainerDimensions] = useState({ width: 900, height: 700 });
+    const graphContainerRef = useRef<HTMLDivElement>(null);
+
+    // Handle Resize
+    useEffect(() => {
+        if (!mounted || !graphContainerRef.current) return;
+
+        const observer = new ResizeObserver((entries) => {
+            if (entries[0]) {
+                const { width, height } = entries[0].contentRect;
+                setContainerDimensions({ width: Math.floor(width), height: Math.floor(height) });
+            }
+        });
+
+        observer.observe(graphContainerRef.current);
+        return () => observer.disconnect();
+    }, [mounted, viewMode]);
 
     useEffect(() => {
         setMounted(true);
@@ -260,17 +295,16 @@ export default function GraphExplorerPage() {
         if (viewMode === '3d' && fgRef.current) {
             const fg = fgRef.current;
 
-            // Add centering force explicitly
-            fg.d3Force('center', (window as any).d3?.forceCenter() || null);
-            fg.d3Force('charge').strength(-120);
-            fg.d3Force('link').distance(50);
+            // Standard force setup
+            fg.d3Force('charge').strength(-150);
+            fg.d3Force('link').distance(40);
 
-            // Give it a small timeout to let the force engine start
+            // Reset position to center of view
             const timeout = setTimeout(() => {
                 if (fgRef.current) {
-                    fgRef.current.zoomToFit(600, 100);
+                    fgRef.current.zoomToFit(800, 150);
                 }
-            }, 800);
+            }, 500);
 
             return () => clearTimeout(timeout);
         }
@@ -283,7 +317,7 @@ export default function GraphExplorerPage() {
                 'background-color': 'data(color)',
                 'width': 'data(size)',
                 'height': 'data(size)',
-                'color': '#cbd5e1',
+                'color': isDark ? '#cbd5e1' : '#475569',
                 'font-size': '10px',
                 'text-valign': 'bottom',
                 'text-halign': 'center',
@@ -298,7 +332,7 @@ export default function GraphExplorerPage() {
             selector: 'edge',
             style: {
                 'width': 1,
-                'line-color': '#475569',
+                'line-color': isDark ? '#475569' : '#cbd5e1',
                 'curve-style': 'haystack',
                 'opacity': 0.3,
                 'overlay-padding': '3px'
@@ -434,7 +468,7 @@ export default function GraphExplorerPage() {
 
     return (
         <Sidebar>
-            <div style={{ maxWidth: '1400px', margin: '0 0' }}>
+            <div style={{ width: '100%', margin: '0' }}>
                 {/* Header */}
                 <div style={styles.header}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '1rem' }}>
@@ -538,7 +572,7 @@ export default function GraphExplorerPage() {
                             <button onClick={() => setShowEdges(!showEdges)} title={showEdges ? "Hide Edges" : "Show Edges"} style={{ ...styles.zoomBtn, color: showEdges ? 'var(--primary)' : 'var(--text-muted)' }}><Share2 size={20} /></button>
                         </div>
 
-                        <div style={{ height: '100%', background: 'var(--bg-primary)', position: 'relative' }}>
+                        <div ref={graphContainerRef} style={{ height: '100%', background: 'var(--bg-primary)', position: 'relative' }}>
                             {viewMode === '2d' ? (
                                 <CytoscapeComponent
                                     elements={elements}
@@ -560,6 +594,8 @@ export default function GraphExplorerPage() {
                             ) : (
                                 <ForceGraph3D
                                     ref={fgRef}
+                                    width={containerDimensions.width}
+                                    height={containerDimensions.height}
                                     graphData={forceGraphData}
                                     nodeLabel="label"
                                     nodeColor="color"

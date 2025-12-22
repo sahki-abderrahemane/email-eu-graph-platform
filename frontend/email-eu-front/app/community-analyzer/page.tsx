@@ -68,14 +68,15 @@ const styles = {
         marginBottom: '1.5rem',
     },
     methodCard: (selected: boolean) => ({
-        padding: '1rem',
-        borderRadius: '0.75rem',
-        border: selected ? '2px solid var(--primary)' : '2px solid var(--border-light)',
-        background: selected ? 'var(--nav-active-bg)' : 'var(--bg-hover)',
+        padding: '1.25rem',
+        borderRadius: '1rem',
+        border: selected ? '2px solid var(--primary)' : '1px solid var(--border-subtle)',
+        background: selected ? 'var(--nav-active-bg)' : 'var(--bg-card)',
         cursor: 'pointer',
         textAlign: 'left' as const,
         position: 'relative' as const,
-        transition: 'all 0.2s',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        boxShadow: selected ? '0 8px 16px rgba(99, 102, 241, 0.15)' : 'none',
     }),
     btnPrimary: (disabled: boolean) => ({
         background: 'linear-gradient(135deg, var(--primary) 0%, var(--accent-purple) 100%)',
@@ -92,8 +93,8 @@ const styles = {
         transition: 'all 0.2s',
     }),
     vizContainer: {
-        height: '320px',
-        marginBottom: '1.5rem',
+        flex: 1,
+        height: '400px',
         position: 'relative' as const,
         borderRadius: '0.75rem',
         background: 'var(--bg-primary)',
@@ -190,7 +191,7 @@ export default function CommunityAnalyzerPage() {
 
     if (!mounted || isLoading) {
         return (
-            <div style={{ minHeight: '100vh', background: '#0a0a0f', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div className="spinner" style={{ width: 48, height: 48, border: '4px solid rgba(99,102,241,0.3)', borderTopColor: '#6366f1', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
                 <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </div>
@@ -209,7 +210,7 @@ export default function CommunityAnalyzerPage() {
                             <h1 style={styles.title}>Community Analyzer</h1>
                             <p style={styles.subtitle}>Discover and analyze network communities</p>
                         </motion.div>
-                        <button style={{ ...styles.btnPrimary(false), background: '#1f1f2d', border: '1px solid rgba(255,255,255,0.1)' }}>
+                        <button style={{ ...styles.btnPrimary(false), background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', color: 'var(--text-secondary)' }}>
                             <Download size={16} /> Export Results
                         </button>
                     </div>
@@ -217,7 +218,7 @@ export default function CommunityAnalyzerPage() {
 
                 {/* Method Selection */}
                 <div style={styles.card}>
-                    <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#f8fafc', marginBottom: '1rem' }}>Detection Method</h2>
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '1.25rem' }}>Detection Method</h2>
                     <div style={styles.methodGrid}>
                         {(['louvain', 'kmeans'] as DetectionMethod[]).map((method) => (
                             <div
@@ -233,8 +234,8 @@ export default function CommunityAnalyzerPage() {
                                 <div style={{ width: 40, height: 40, borderRadius: 8, background: methodColors[method], display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.75rem' }}>
                                     <Layers color="white" size={20} />
                                 </div>
-                                <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#f8fafc', textTransform: 'capitalize' }}>{method}</h3>
-                                <p style={{ fontSize: '0.875rem', color: '#94a3b8', marginTop: '0.25rem' }}>{methodDescriptions[method]}</p>
+                                <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)', textTransform: 'capitalize' }}>{method}</h3>
+                                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>{methodDescriptions[method]}</p>
                             </div>
                         ))}
                     </div>
@@ -244,159 +245,143 @@ export default function CommunityAnalyzerPage() {
                     </button>
                 </div>
 
-                {/* Results Grid */}
+                {/* Community Results Header & Main Section */}
                 {communities.length > 0 && (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' } as any}>
-                        {/* Communities List */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                        {/* Visualization and List Side-by-Side */}
                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={styles.card}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                                <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#f8fafc' }}>Detected Communities</h3>
-                                <span style={{ padding: '0.25rem 0.5rem', borderRadius: 999, background: 'rgba(99,102,241,0.2)', color: '#818cf8', fontSize: '0.75rem' }}>{communities.length} communities</span>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                                <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)' }}>Network Communities Matrix</h3>
+                                <span style={{ padding: '0.25rem 0.75rem', borderRadius: 999, background: 'var(--nav-active-bg)', color: 'var(--primary-light)', fontSize: '0.75rem' }}>{communities.length} clusters detected</span>
                             </div>
 
-                            <div style={styles.vizContainer}>
-                                <div style={{ position: 'absolute', inset: 0 }}>
-                                    {communities.map((community, i) => {
-                                        const angle = (i * 360) / communities.length;
-                                        // Simple circular layout for viz
-                                        const x = 50 + Math.cos(angle * Math.PI / 180) * 30;
-                                        const y = 50 + Math.sin(angle * Math.PI / 180) * 30;
-                                        const size = 10 + (community.size / 10);
+                            <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', flexDirection: 'row-reverse' }}>
+                                {/* Right: Visualization (Reversed) */}
+                                <div style={styles.vizContainer}>
+                                    <div style={{ position: 'absolute', inset: 0 }}>
+                                        {communities.map((community, i) => {
+                                            const angle = (i * 360) / communities.length;
+                                            const x = 50 + Math.cos(angle * Math.PI / 180) * 35;
+                                            const y = 50 + Math.sin(angle * Math.PI / 180) * 35;
+                                            const size = 8 + (community.size / 15);
 
-                                        return (
-                                            <motion.div
-                                                key={community.id}
-                                                initial={{ scale: 0 }}
-                                                animate={{ scale: 1 }}
-                                                transition={{ delay: i * 0.05 }}
-                                                onClick={() => setSelectedCommunity(community)}
-                                                style={{
-                                                    position: 'absolute',
-                                                    left: `${x}%`,
-                                                    top: `${y}%`,
-                                                    width: `${size}%`,
-                                                    height: `${size}%`, // Use percentage for responsive scaling within bucket
-                                                    minWidth: '30px', minHeight: '30px', // Min size
-                                                    background: community.color,
-                                                    borderRadius: '50%',
-                                                    transform: 'translate(-50%, -50%)',
-                                                    cursor: 'pointer',
-                                                    border: selectedCommunity?.id === community.id ? '2px solid white' : 'none',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    color: 'white', fontWeight: 'bold', fontSize: '0.75rem',
-                                                    boxShadow: '0 4px 10px rgba(0,0,0,0.3)'
-                                                }}
-                                            >
-                                                {community.size}
-                                            </motion.div>
-                                        );
-                                    })}
+                                            return (
+                                                <motion.div
+                                                    key={community.id}
+                                                    initial={{ scale: 0 }}
+                                                    animate={{ scale: 1 }}
+                                                    transition={{ delay: i * 0.05 }}
+                                                    onClick={() => setSelectedCommunity(community)}
+                                                    whileHover={{ scale: 1.1, boxShadow: '0 0 20px var(--primary-light)' }}
+                                                    style={{
+                                                        position: 'absolute',
+                                                        left: `${x}%`,
+                                                        top: `${y}%`,
+                                                        width: `${size}%`,
+                                                        height: `${size}%`,
+                                                        minWidth: '35px', minHeight: '35px',
+                                                        background: community.color,
+                                                        borderRadius: '50%',
+                                                        transform: 'translate(-50%, -50%)',
+                                                        cursor: 'pointer',
+                                                        border: selectedCommunity?.id === community.id ? '3px solid #ffffff' : 'none',
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        color: '#ffffff', fontWeight: 'bold', fontSize: '0.75rem',
+                                                        boxShadow: '0 8px 16px rgba(0,0,0,0.2)'
+                                                    }}
+                                                >
+                                                    {community.size}
+                                                </motion.div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div style={{ overflowX: 'auto' }}>
-                                <table style={styles.table}>
-                                    <thead>
-                                        <tr>
-                                            <th style={styles.th}>Community</th>
-                                            <th style={styles.th}>Size</th>
-                                            <th style={styles.th}>Density</th>
-                                            <th style={styles.th}>Avg Degree</th>
-                                            <th style={styles.th}></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {communities.map((community, i) => (
-                                            <tr key={community.id}
-                                                onClick={() => setSelectedCommunity(community)}
-                                                style={{ cursor: 'pointer', background: selectedCommunity?.id === community.id ? 'var(--nav-active-bg)' : 'transparent' }}
-                                            >
-                                                <td style={styles.td}>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                        <div style={{ width: 12, height: 12, borderRadius: '50%', background: community.color }} />
-                                                        Community {community.id}
-                                                    </div>
-                                                </td>
-                                                <td style={styles.td}>{community.size}</td>
-                                                <td style={styles.td}>{community.density.toFixed(3)}</td>
-                                                <td style={styles.td}>{community.avgDegree}</td>
-                                                <td style={styles.td}><ArrowUpRight size={16} color="var(--text-muted)" /></td>
+                                {/* Right: Vertical List of Communities */}
+                                <div style={{ flex: 1, minWidth: '300px', maxHeight: '400px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                                    <table style={styles.table}>
+                                        <thead style={{ position: 'sticky', top: 0, background: 'var(--bg-card)', zIndex: 10 }}>
+                                            <tr>
+                                                <th style={styles.th}>Cluster</th>
+                                                <th style={styles.th}>Size</th>
+                                                <th style={styles.th}>Density</th>
+                                                <th style={styles.th}>Deg</th>
+                                                <th style={styles.th}></th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            {communities.map((community) => (
+                                                <tr key={community.id}
+                                                    onClick={() => setSelectedCommunity(community)}
+                                                    style={{ cursor: 'pointer', transition: 'all 0.2s', background: selectedCommunity?.id === community.id ? 'var(--nav-active-bg)' : 'transparent' }}
+                                                >
+                                                    <td style={styles.td}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                            <div style={{ width: 10, height: 10, borderRadius: '50%', background: community.color }} />
+                                                            <span style={{ fontWeight: 500 }}>ID {community.id}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td style={styles.td}>{community.size}</td>
+                                                    <td style={styles.td}>{community.density.toFixed(2)}</td>
+                                                    <td style={styles.td}>{community.avgDegree}</td>
+                                                    <td style={styles.td}><ArrowUpRight size={14} color="var(--text-muted)" /></td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </motion.div>
 
-                        {/* Details Panel */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} style={styles.card}>
-                                <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '1rem' }}>Quality Metrics</h3>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                    {[
-                                        { label: 'Modularity', val: comparisonMetrics?.modularity, color: 'var(--primary)' },
-                                        { label: 'NMI Score', val: comparisonMetrics?.nmi, color: 'var(--accent-purple)' },
-                                        { label: 'ARI Score', val: comparisonMetrics?.ari, color: 'var(--color-success)' },
-                                        { label: 'Coverage', val: `${comparisonMetrics?.coverage}%`, color: 'var(--color-error)', max: 100 }
-                                    ].map((m, i) => (
-                                        <div key={i}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
-                                                <span style={{ color: 'var(--text-muted)' }}>{m.label}</span>
-                                                <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{m.val}</span>
-                                            </div>
-                                            <div style={styles.metricBar}>
-                                                <motion.div
-                                                    initial={{ width: 0 }}
-                                                    animate={{ width: m.label === 'Coverage' ? `${parseFloat(m.val as string)}%` : `${parseFloat(m.val as string) * 100}%` }}
-                                                    style={{ height: '100%', background: m.color, borderRadius: 999 }}
-                                                />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </motion.div>
-
-                            <AnimatePresence mode="wait">
-                                {selectedCommunity && (
-                                    <motion.div
-                                        key={selectedCommunity.id}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        style={styles.card}
-                                    >
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                                            <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--nav-active-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                <Users size={20} color={selectedCommunity.color} />
+                        {/* Selected Community Details - Horizontal Bar */}
+                        <AnimatePresence mode="wait">
+                            {selectedCommunity && (
+                                <motion.div
+                                    key={selectedCommunity.id}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 20 }}
+                                    style={{ ...styles.card, marginBottom: '0' }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
+                                        {/* Identity */}
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: '180px' }}>
+                                            <div style={{ width: 50, height: 50, borderRadius: 12, background: 'var(--nav-active-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <Users size={24} color={selectedCommunity.color} />
                                             </div>
                                             <div>
-                                                <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)' }}>Community {selectedCommunity.id}</h3>
-                                                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{selectedCommunity.size} members</p>
+                                                <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)' }}>Community {selectedCommunity.id}</h3>
+                                                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{selectedCommunity.size} Members</p>
                                             </div>
                                         </div>
 
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                                            <div style={{ padding: '0.75rem', background: 'var(--bg-hover)', borderRadius: '0.5rem', textAlign: 'center' }}>
-                                                <p style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>{selectedCommunity.density.toFixed(3)}</p>
-                                                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Density</p>
+                                        {/* Metrics - Side-by-Side */}
+                                        <div style={{ display: 'flex', gap: '1rem', flex: 1 }}>
+                                            <div style={{ flex: 1, padding: '1rem', background: 'var(--bg-card)', borderRadius: '1rem', border: '1px solid var(--border-subtle)', textAlign: 'center' }}>
+                                                <p style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary-light)' }}>{selectedCommunity.density.toFixed(3)}</p>
+                                                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Density</p>
                                             </div>
-                                            <div style={{ padding: '0.75rem', background: 'var(--bg-hover)', borderRadius: '0.5rem', textAlign: 'center' }}>
-                                                <p style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>{selectedCommunity.avgDegree}</p>
-                                                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Avg Degree</p>
+                                            <div style={{ flex: 1, padding: '1rem', background: 'var(--bg-card)', borderRadius: '1rem', border: '1px solid var(--border-subtle)', textAlign: 'center' }}>
+                                                <p style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--accent-purple)' }}>{selectedCommunity.avgDegree}</p>
+                                                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Avg Degree</p>
                                             </div>
                                         </div>
 
-                                        <div>
-                                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>TOP NODES</p>
+                                        {/* Top Nodes - Horizontal List */}
+                                        <div style={{ flex: 1.5, minWidth: '250px' }}>
+                                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Key Influence Nodes</p>
                                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                                                 {selectedCommunity.topNodes.map((nid, i) => (
-                                                    <span key={i} style={{ padding: '0.25rem 0.5rem', background: 'var(--bg-hover)', borderRadius: '0.25rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Node {nid}</span>
+                                                    <span key={i} style={{ padding: '0.5rem 0.75rem', background: 'var(--bg-card)', borderRadius: '0.75rem', border: '1px solid var(--border-subtle)', fontSize: '0.875rem', color: 'var(--text-primary)', fontWeight: 500 }}>
+                                                        N {nid}
+                                                    </span>
                                                 ))}
                                             </div>
                                         </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                 )}
                 {/* Empty State */}

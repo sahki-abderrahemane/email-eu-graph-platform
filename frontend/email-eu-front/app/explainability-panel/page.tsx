@@ -135,7 +135,7 @@ const styles = {
     }),
     gridCols3: {
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
         gap: '1.5rem',
     },
     featureItem: {
@@ -355,17 +355,18 @@ export default function ExplainabilityPanelPage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
-                            style={styles.gridCols3} // Grid layout
+                            style={styles.gridCols3}
                         >
-                            <div style={{ gridColumn: 'span 2' }}>
+                            {/* Row 1: Prediction & Reasoning Summary - Full Width */}
+                            <div style={{ gridColumn: 'span 3' }}>
                                 <div style={styles.card}>
                                     <div style={{ padding: '1.5rem', borderRadius: '0.75rem', background: 'var(--nav-active-bg)', border: '1px solid var(--border-light)', marginBottom: '1.5rem' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
                                             <span style={{ color: 'var(--text-secondary)' }}>Prediction Explanation for</span>
-                                            <span style={{ padding: '0.25rem 0.75rem', borderRadius: '999px', background: 'var(--primary)', color: 'white', fontSize: '0.75rem', fontWeight: 'bold' }}>Node {explanation.nodeId}</span>
+                                            <span style={{ padding: '0.25rem 0.75rem', borderRadius: '999px', background: 'var(--primary)', color: '#ffffff', fontSize: '0.75rem', fontWeight: 'bold' }}>Node {explanation.nodeId}</span>
                                         </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                                            <div style={{ width: 80, height: 80, borderRadius: 16, background: getDeptColor(explanation.predictedDepartment), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.875rem', fontWeight: 'bold', color: 'white' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
+                                            <div style={{ width: 80, height: 80, borderRadius: 16, background: getDeptColor(explanation.predictedDepartment), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.875rem', fontWeight: 'bold', color: '#ffffff' }}>
                                                 {explanation.predictedDepartment}
                                             </div>
                                             <div>
@@ -381,78 +382,78 @@ export default function ExplainabilityPanelPage() {
                                         </div>
                                     </div>
 
-                                    <h4 style={{ fontSize: '1rem', fontWeight: 600, color: '#f8fafc', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <Info size={20} color="#818cf8" /> Reasoning
+                                    <h4 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <Info size={20} color="var(--primary-light)" /> Reasoning
                                     </h4>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
                                         {explanation.reasoning.map((reason: string, i: number) => (
-                                            <div key={i} style={{ display: 'flex', alignItems: 'start', gap: '0.75rem', padding: '0.75rem', background: '#1f1f2d', borderRadius: '0.75rem' }}>
-                                                <ChevronRight size={20} color="#818cf8" />
-                                                <p style={{ fontSize: '0.875rem', color: '#cbd5e1' }}>{reason}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                                <div style={styles.card}>
-                                    <h4 style={{ fontSize: '1rem', fontWeight: 600, color: '#f8fafc', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <Layers size={20} color="#a855f7" /> Node Features
-                                    </h4>
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '1rem' }}>
-                                        {Object.entries(explanation.features).map(([key, value]: [string, any]) => (
-                                            <div key={key} style={{ padding: '1rem', background: '#1f1f2d', borderRadius: '0.75rem', textAlign: 'center' }}>
-                                                <p style={{ color: '#f8fafc', fontWeight: 'bold', fontSize: '1.125rem' }}>{value}</p>
-                                                <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.25rem' }}>{key}</p>
+                                            <div key={i} style={{ display: 'flex', alignItems: 'start', gap: '0.75rem', padding: '1rem', background: 'var(--bg-card)', borderRadius: '1rem', border: '1px solid var(--border-subtle)', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                                                <ChevronRight size={20} color="var(--primary-light)" />
+                                                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{reason}</p>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
                             </div>
 
-                            <div>
-                                <div style={styles.card}>
-                                    <h4 style={{ fontSize: '1rem', fontWeight: 600, color: '#f8fafc', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <Users size={20} color="#f472b6" /> Neighbors
-                                    </h4>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1rem' }}>
-                                        <div style={{ padding: '0.75rem', background: '#1f1f2d', borderRadius: '0.5rem', textAlign: 'center' }}>
-                                            <p style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#f8fafc' }}>{explanation.neighborAnalysis.totalNeighbors}</p>
-                                            <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Total</p>
+                            {/* Row 2: Features, Neighbors, and Similar Nodes side-by-side */}
+                            <div style={styles.card}>
+                                <h4 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <Layers size={20} color="var(--accent-purple)" /> Node Features
+                                </h4>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                    {Object.entries(explanation.features).map(([key, value]: [string, any]) => (
+                                        <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'var(--bg-card)', borderRadius: '1rem', border: '1px solid var(--border-subtle)', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{key}</p>
+                                            <p style={{ color: 'var(--text-primary)', fontWeight: 'bold', fontSize: '1rem' }}>{value}</p>
                                         </div>
-                                        <div style={{ padding: '0.75rem', background: '#1f1f2d', borderRadius: '0.5rem', textAlign: 'center' }}>
-                                            <p style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#10b981' }}>{explanation.neighborAnalysis.sameDeptNeighbors}</p>
-                                            <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Same Dept</p>
-                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div style={styles.card}>
+                                <h4 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <Users size={20} color="var(--accent-pink)" /> Neighbors
+                                </h4>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1.25rem' }}>
+                                    <div style={{ padding: '1rem', background: 'var(--bg-card)', borderRadius: '1rem', textAlign: 'center', border: '1px solid var(--border-subtle)' }}>
+                                        <p style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>{explanation.neighborAnalysis.totalNeighbors}</p>
+                                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Total</p>
                                     </div>
-                                    <div>
-                                        <p style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '0.5rem' }}>DISTRIBUTION</p>
-                                        {explanation.neighborAnalysis.departmentDistribution.map((item: any, i: number) => (
-                                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                                <div style={{ width: 12, height: 12, borderRadius: '50%', background: getDeptColor(item.dept) }} />
-                                                <span style={{ fontSize: '0.875rem', color: '#cbd5e1', flex: 1 }}>{getDeptName(item.dept)}</span>
-                                                <span style={{ fontSize: '0.875rem', color: '#f8fafc', fontWeight: 500 }}>{item.count}</span>
-                                            </div>
-                                        ))}
+                                    <div style={{ padding: '1rem', background: 'var(--bg-card)', borderRadius: '1rem', textAlign: 'center', border: '1px solid var(--border-subtle)' }}>
+                                        <p style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--color-success)' }}>{explanation.neighborAnalysis.sameDeptNeighbors}</p>
+                                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Same Dept</p>
                                     </div>
                                 </div>
+                                <div style={{ maxHeight: '200px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>DISTRIBUTION</p>
+                                    {explanation.neighborAnalysis.departmentDistribution.map((item: any, i: number) => (
+                                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem', padding: '0.5rem', borderRadius: '0.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-subtle)' }}>
+                                            <div style={{ width: 10, height: 10, borderRadius: '50%', background: getDeptColor(item.dept) }} />
+                                            <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', flex: 1 }}>{getDeptName(item.dept)}</span>
+                                            <span style={{ fontSize: '0.875rem', color: 'var(--text-primary)', fontWeight: 600 }}>{item.count}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
 
-                                <div style={styles.card}>
-                                    <h4 style={{ fontSize: '1rem', fontWeight: 600, color: '#f8fafc', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <Sparkles size={20} color="#f97316" /> Similar Nodes
-                                    </h4>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                        {explanation.similarNodes.map((node: SimilarNode, i: number) => (
-                                            <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', borderRadius: '0.75rem', background: 'var(--bg-hover)', border: '1px solid var(--border-subtle)' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                                    <div style={{ width: 32, height: 32, borderRadius: 8, background: getDeptColor(node.department), display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '0.75rem', fontWeight: 'bold' }}>{node.id}</div>
-                                                    <div>
-                                                        <p style={{ fontSize: '0.875rem', color: 'var(--text-primary)', fontWeight: 500 }}>Node {node.id}</p>
-                                                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{node.sharedNeighbors} shared</p>
-                                                    </div>
+                            <div style={styles.card}>
+                                <h4 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <Sparkles size={20} color="var(--accent-orange)" /> Similar Nodes
+                                </h4>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '310px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                                    {explanation.similarNodes.map((node: SimilarNode, i: number) => (
+                                        <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', borderRadius: '0.75rem', background: 'var(--bg-hover)', border: '1px solid var(--border-subtle)' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                <div style={{ width: 32, height: 32, borderRadius: 8, background: getDeptColor(node.department), display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffffff', fontSize: '0.75rem', fontWeight: 'bold' }}>{node.id}</div>
+                                                <div>
+                                                    <p style={{ fontSize: '0.875rem', color: 'var(--text-primary)', fontWeight: 500 }}>Node {node.id}</p>
+                                                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{node.sharedNeighbors} shared</p>
                                                 </div>
-                                                <span style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.875rem' }}>{(node.similarity * 100).toFixed(0)}%</span>
                                             </div>
-                                        ))}
-                                    </div>
+                                            <span style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.875rem' }}>{(node.similarity * 100).toFixed(0)}%</span>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         </motion.div>

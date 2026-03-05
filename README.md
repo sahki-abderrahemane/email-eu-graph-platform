@@ -85,7 +85,7 @@ email-eu-graph-platform/
 
 ---
 
-##  Phase 1 – Exploratory Graph Analysis
+##   1 – Exploratory Graph Analysis
 
 * Degree distribution (in/out)
 * Strongly & weakly connected components
@@ -100,7 +100,7 @@ email-eu-graph-platform/
 
 ---
 
-##  Phase 2 – Classical ML Baselines
+##   2 – Classical ML Baselines
 
 ### Features
 
@@ -122,7 +122,7 @@ email-eu-graph-platform/
 
 ---
 
-##  Phase 3 – Graph Embeddings (Node2Vec)
+##   Graph Embeddings (Node2Vec)
 
 ### Techniques
 
@@ -141,7 +141,7 @@ email-eu-graph-platform/
 
 ---
 
-##  Phase 4 – Link Prediction
+##   4 – Link Prediction
 
 ### Features
 
@@ -149,25 +149,17 @@ email-eu-graph-platform/
 * Adamic-Adar
 * Jaccard Coefficient
 * Preferential Attachment
-* Cosine similarity of Node2Vec embeddings
 
 ### Evaluation
 
 * ROC-AUC
-* Precision@k
-
 ---
 
-##  Phase 5 – Unsupervised Learning
+##   5 – Unsupervised Learning
 
-* Louvain & Leiden community detection
+* Louvain community detection
 * KMeans on embeddings
 * Comparison with ground-truth departments
-
-### Metrics
-
-* Normalized Mutual Information (NMI)
-* Adjusted Rand Index (ARI)
 
 ---
 
@@ -220,31 +212,10 @@ email-eu-graph-platform/
 * Cytoscape.js
 * Chart.js / Recharts
 
-### DevOps
-
-* Docker
-* REST APIs
 
 ---
 
 
-##  Professional & Academic Value
-
-This project demonstrates:
-
-* Advanced **Graph Machine Learning**
-* End-to-end **ML system design**
-* **Production-ready ML deployment**
-* Interactive **data storytelling**
-
-It is suitable for:
-
-* Final-year engineering projects
-* AI / Data Science portfolios
-* Research experimentation
-* Professional graph analytics demos
-
----
 
 ## Future Extensions
 
@@ -253,14 +224,6 @@ It is suitable for:
 * Semi-supervised learning
 * Scalability to million-node graphs
 * Role-based access for organizations
-
----
-
-##  References
-
-* Jure Leskovec et al., SNAP Datasets
-* Hao Yin et al., *Local Higher-order Graph Clustering*, KDD 2017
-* Node2Vec: Grover & Leskovec, KDD 2016
 
 ---
 

@@ -56,7 +56,12 @@ coverage/
 models/saved/
 data/processed/*.pkl
 data/processed/*.csv
-*.npy
+# *.npy files are committed (needed by ML service on Render)
+# Exclude only large training split files, keep embeddings and IDs
+models/trained_models_complete/X_train.npy
+models/trained_models_complete/X_val.npy
+models/trained_models_complete/y_train.npy
+models/trained_models_complete/y_val.npy
 
 # Temporary files
 *.tmp

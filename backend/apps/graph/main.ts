@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { GraphModule } from './graph.module';
+import * as http from 'http';
 
 function parseRedisUrl(url: string) {
     const parsed = new URL(url);
@@ -31,5 +32,16 @@ async function bootstrap() {
 
     await app.listen();
     console.log('Graph Service is running via Redis transport');
+
+    // HTTP server so Render detects an open port
+    const port = process.env.PORT || 3003;
+    http
+        .createServer((req, res) => {
+            res.writeHead(200);
+            res.end(JSON.stringify({ status: 'ok', service: 'graph-service' }));
+        })
+        .listen(port, () => {
+            console.log(`Graph Service health check listening on port ${port}`);
+        });
 }
 bootstrap();

@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { UserServiceModule } from './user-service.module';
+import * as http from 'http';
 
 function parseRedisUrl(url: string) {
     const parsed = new URL(url);
@@ -31,5 +32,16 @@ async function bootstrap() {
 
     await app.listen();
     console.log('User Service is running via Redis transport');
+
+    // HTTP server so Render detects an open port
+    const port = process.env.PORT || 3002;
+    http
+        .createServer((req, res) => {
+            res.writeHead(200);
+            res.end(JSON.stringify({ status: 'ok', service: 'user-service' }));
+        })
+        .listen(port, () => {
+            console.log(`User Service health check listening on port ${port}`);
+        });
 }
 bootstrap();

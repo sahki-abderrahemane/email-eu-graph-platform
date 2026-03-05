@@ -2,47 +2,71 @@ import { Module } from '@nestjs/common';
 import { ApiGatewayController } from './api-gateway.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { HttpModule } from '@nestjs/axios';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
+function redisOptions(configService: ConfigService) {
+  const url = configService.get<string>('REDIS_URL');
+  if (url) {
+    const parsed = new URL(url);
+    return {
+      host: parsed.hostname,
+      port: parseInt(parsed.port) || 6379,
+      password: parsed.password || undefined,
+      tls: parsed.protocol === 'rediss:' ? {} : undefined,
+    };
+  }
+  return {
+    host: configService.get<string>('REDIS_HOST') || 'localhost',
+    port: parseInt(configService.get<string>('REDIS_PORT')) || 6379,
+    password: configService.get<string>('REDIS_PASSWORD') || undefined,
+  };
+}
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     HttpModule.register({
       timeout: 8000,
       maxRedirects: 5,
     }),
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
         name: 'AUTH_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 3001,
-        },
+        imports: [ConfigModule],
+        useFactory: (cfg: ConfigService) => ({
+          transport: Transport.REDIS,
+          options: redisOptions(cfg),
+        }),
+        inject: [ConfigService],
       },
       {
         name: 'USER_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 3002,
-        },
+        imports: [ConfigModule],
+        useFactory: (cfg: ConfigService) => ({
+          transport: Transport.REDIS,
+          options: redisOptions(cfg),
+        }),
+        inject: [ConfigService],
       },
       {
         name: 'GRAPH_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 3003,
-        },
+        imports: [ConfigModule],
+        useFactory: (cfg: ConfigService) => ({
+          transport: Transport.REDIS,
+          options: redisOptions(cfg),
+        }),
+        inject: [ConfigService],
       },
       {
         name: 'VISUALIZATION_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 3004,
-        },
-      }
-    ])
+        imports: [ConfigModule],
+        useFactory: (cfg: ConfigService) => ({
+          transport: Transport.REDIS,
+          options: redisOptions(cfg),
+        }),
+        inject: [ConfigService],
+      },
+    ]),
   ],
   controllers: [ApiGatewayController],
 })

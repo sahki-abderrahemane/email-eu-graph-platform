@@ -6,7 +6,7 @@ import { Public } from 'libs/common/decorators/public.decorator';
 
 @Controller('api')
 export class ApiGatewayController {
-  private readonly mlServiceUrl = 'http://localhost:8000';
+  private readonly mlServiceUrl = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 
   constructor(
     @Inject('AUTH_SERVICE') private authClient: ClientProxy,

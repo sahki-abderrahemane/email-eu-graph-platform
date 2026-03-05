@@ -18,7 +18,17 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/backend/test/jest-e2e.json",
-    "start:all": "concurrently --names \"API-Gateway,Auth-Service,User-Service,Graph-Service,Vis-Service\" --prefix \"[{name}]\" --prefix-colors \"blue,green,red,yellow,magenta\" \"npm run start:dev -- api-gateway\" \"npm run start:dev -- auth-service\"  \"npm run start:dev -- user-service\" \"npm run start:dev -- graph\" \"npm run start:dev -- visualization-service\""
+    "start:all": "concurrently --names \"API-Gateway,Auth-Service,User-Service,Graph-Service,Vis-Service\" --prefix \"[{name}]\" --prefix-colors \"blue,green,red,yellow,magenta\" \"npm run start:dev -- api-gateway\" \"npm run start:dev -- auth-service\"  \"npm run start:dev -- user-service\" \"npm run start:dev -- graph\" \"npm run start:dev -- visualization-service\"",
+    "build:gateway": "nest build api-gateway",
+    "build:auth": "nest build auth-service",
+    "build:graph": "nest build graph",
+    "build:visualization": "nest build visualization-service",
+    "build:user": "nest build user-service",
+    "start:gateway": "node dist/apps/api-gateway/main",
+    "start:auth": "node dist/apps/auth-service/main",
+    "start:graph": "node dist/apps/graph/main",
+    "start:visualization": "node dist/apps/visualization-service/main",
+    "start:user": "node dist/apps/user-service/main"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.1",
@@ -35,6 +45,7 @@
     "bcryptjs": "^3.0.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
+    "ioredis": "^5.10.0",
     "mongoose": "^9.0.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",

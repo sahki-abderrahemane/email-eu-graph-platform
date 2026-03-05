@@ -4,9 +4,13 @@ import { ApiGatewayModule } from './api-gateway.module';
 async function bootstrap() {
     const app = await NestFactory.create(ApiGatewayModule);
 
-    app.enableCors();
+    app.enableCors({
+        origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*',
+        credentials: true,
+    });
 
-    await app.listen(3000);
-    console.log('🚀 API Gateway running on http://localhost:3000');
+    const port = process.env.PORT || 3000;
+    await app.listen(port);
+    console.log(`API Gateway running on port ${port}`);
 }
 bootstrap();

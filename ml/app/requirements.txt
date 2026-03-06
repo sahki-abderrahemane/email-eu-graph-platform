@@ -7,7 +7,7 @@ python-multipart
 
 # Data Science & ML
 numpy
-pandas==2.0.3
+pandas
 scikit-learn
 scipy
 

@@ -1,4 +1,6 @@
 import os
+import sys
+import traceback
 import joblib
 import numpy as np
 import networkx as nx
@@ -47,8 +49,18 @@ class ModelManager:
         self.labels = None
         self.pagerank = {}
         
-        self.load_models()
-        self.load_graph()
+        try:
+            self.load_models()
+        except Exception as e:
+            print(f"STARTUP ERROR in load_models: {e}", file=sys.stderr)
+            traceback.print_exc(file=sys.stderr)
+        
+        try:
+            self.load_graph()
+        except Exception as e:
+            print(f"STARTUP ERROR in load_graph: {e}", file=sys.stderr)
+            traceback.print_exc(file=sys.stderr)
+        
         self.initialized = True
 
     def load_models(self):
@@ -437,4 +449,22 @@ class ModelManager:
             "is_correct": bool(int(pred) == actual_dept)
         }
 
-model_manager = ModelManager()
+try:
+    model_manager = ModelManager()
+    print("ModelManager initialized successfully", file=sys.stderr)
+except Exception as e:
+    print(f"FATAL: ModelManager failed to initialize: {e}", file=sys.stderr)
+    traceback.print_exc(file=sys.stderr)
+    # Create a dummy instance so the app can at least start and serve basic routes
+    model_manager = ModelManager.__new__(ModelManager)
+    model_manager.initialized = False
+    model_manager.classifier = None
+    model_manager.link_predictor = None
+    model_manager.node2vec_model = None
+    model_manager.embeddings = None
+    model_manager.node_id_map = None
+    model_manager.X_test = None
+    model_manager.y_test = None
+    model_manager.graph = None
+    model_manager.labels = None
+    model_manager.pagerank = {}

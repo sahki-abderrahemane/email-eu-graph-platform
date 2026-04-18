@@ -1,6 +1,25 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from routes import predict, embeddings, link_prediction, community, analysis
+import sys
+import os
+
+# Add the directory containing main.py to Python's path
+# This allows 'import routes' to work even if uvicorn is started from the project root
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+print("Starting Email-EU ML Service...", file=sys.stderr)
+sys.stdout.flush()
+sys.stderr.flush()
+
+try:
+    from fastapi import FastAPI
+    from fastapi.middleware.cors import CORSMiddleware
+    from routes import predict, embeddings, link_prediction, community, analysis
+    print("Imports successful!", file=sys.stderr)
+except Exception as e:
+    import traceback
+    print(f"CRITICAL ERROR IMPORTING ROUTES/APP: {e}", file=sys.stderr)
+    traceback.print_exc(file=sys.stderr)
+    sys.stderr.flush()
+    raise
 
 app = FastAPI(
     title="Email-EU ML Service",

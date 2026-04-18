@@ -1,11 +1,38 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, Query, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, timeout, catchError, throwError } from 'rxjs';
 import { Public } from 'libs/common/decorators/public.decorator';
+
+/** Timeout for Redis microservice calls (ms) */
+const SERVICE_TIMEOUT = 15_000;
+
+/**
+ * Helper: send a message to a microservice with a timeout so the request
+ * never hangs indefinitely if the service or Redis is unreachable.
+ */
+function rpc<T>(client: ClientProxy, pattern: string, data: any) {
+  return firstValueFrom(
+    client.send<T>(pattern, data).pipe(
+      timeout(SERVICE_TIMEOUT),
+      catchError((err) => {
+        const message =
+          err?.name === 'TimeoutError'
+            ? `Service did not respond within ${SERVICE_TIMEOUT}ms (pattern: ${pattern})`
+            : err?.message || 'Unknown microservice error';
+        return throwError(() => ({
+          statusCode: err?.name === 'TimeoutError' ? 504 : 500,
+          message,
+          pattern,
+        }));
+      }),
+    ),
+  );
+}
 
 @Controller('api')
 export class ApiGatewayController {
+  private readonly logger = new Logger(ApiGatewayController.name);
   private readonly mlServiceUrl = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 
   constructor(
@@ -26,35 +53,35 @@ export class ApiGatewayController {
   @Public()
   @Post('auth/register')
   async register(@Body() credentials: { email: string; password: string; name: string }) {
-    return firstValueFrom(this.authClient.send('auth.register', credentials));
+    return rpc(this.authClient, 'auth.register', credentials);
   }
 
   @Public()
   @Post('auth/login')
   async login(@Body() credentials: { email: string; password: string }) {
-    return firstValueFrom(this.authClient.send('auth.login', credentials));
+    return rpc(this.authClient, 'auth.login', credentials);
   }
 
   @Post('auth/verify')
   async verify(@Body() { token }: { token: string }) {
-    return firstValueFrom(this.authClient.send('auth.verify', { token }));
+    return rpc(this.authClient, 'auth.verify', { token });
   }
 
   // ============ USER ENDPOINTS ============
   @Public()
   @Post('users')
   async createUser(@Body() createUserDto: { email: string; password: string; name: string }) {
-    return firstValueFrom(this.authClient.send('user.create', createUserDto));
+    return rpc(this.authClient, 'user.create', createUserDto);
   }
 
   @Get('users')
   async getAllUsers() {
-    return firstValueFrom(this.authClient.send('user.findAll', {}));
+    return rpc(this.authClient, 'user.findAll', {});
   }
 
   @Get('users/:id')
   async getUserById(@Param('id') id: string) {
-    return firstValueFrom(this.authClient.send('user.findOne', { id }));
+    return rpc(this.authClient, 'user.findOne', { id });
   }
 
   @Patch('users/:id')
@@ -62,60 +89,58 @@ export class ApiGatewayController {
     @Param('id') id: string,
     @Body() updateUserDto: { email?: string; name?: string; role?: string },
   ) {
-    return firstValueFrom(
-      this.authClient.send('user.update', { id, ...updateUserDto }),
-    );
+    return rpc(this.authClient, 'user.update', { id, ...updateUserDto });
   }
 
   @Delete('users/:id')
   async deleteUser(@Param('id') id: string) {
-    return firstValueFrom(this.authClient.send('user.delete', { id }));
+    return rpc(this.authClient, 'user.delete', { id });
   }
 
   @Get('users/:id/profile')
   async getUserProfile(@Param('id') id: string) {
-    return firstValueFrom(this.authClient.send('user.profile', { id }));
+    return rpc(this.authClient, 'user.profile', { id });
   }
 
   // ============ GRAPH ENDPOINTS ============
   @Get('graph/stats')
   async getGraphStats() {
-    return firstValueFrom(this.graphClient.send('graph.stats', {}));
+    return rpc(this.graphClient, 'graph.stats', {});
   }
 
   @Get('graph/nodes')
   async getNodes() {
-    return firstValueFrom(this.graphClient.send('graph.nodes', {}));
+    return rpc(this.graphClient, 'graph.nodes', {});
   }
 
   @Get('graph/edges')
   async getEdges() {
-    return firstValueFrom(this.graphClient.send('graph.edges', {}));
+    return rpc(this.graphClient, 'graph.edges', {});
   }
 
   @Post('graph/node/:id')
   async getNodeDetails(@Param('id') id: string) {
-    return firstValueFrom(this.graphClient.send('graph.node.details', { id: +id }));
+    return rpc(this.graphClient, 'graph.node.details', { id: +id });
   }
 
   @Get('graph/degree-distribution')
   async getDegreeDist() {
-    return firstValueFrom(this.graphClient.send('graph.degree.distribution', {}));
+    return rpc(this.graphClient, 'graph.degree.distribution', {});
   }
 
   @Get('graph/clustering-coefficient')
   async getClusteringCoeff() {
-    return firstValueFrom(this.graphClient.send('graph.clustering', {}));
+    return rpc(this.graphClient, 'graph.clustering', {});
   }
 
   @Get('graph/centrality')
   async getCentrality() {
-    return firstValueFrom(this.graphClient.send('graph.centrality', {}));
+    return rpc(this.graphClient, 'graph.centrality', {});
   }
 
   @Get('graph/activity')
   async getRecentActivity() {
-    return firstValueFrom(this.graphClient.send('graph.activity', {}));
+    return rpc(this.graphClient, 'graph.activity', {});
   }
 
   @Get('graph/prediction/history')
@@ -124,37 +149,33 @@ export class ApiGatewayController {
     @Query('limit') limit?: number,
     @Query('offset') offset?: number,
   ) {
-    return firstValueFrom(
-      this.graphClient.send('graph.prediction.history', { userId, limit, offset }),
-    );
+    return rpc(this.graphClient, 'graph.prediction.history', { userId, limit, offset });
   }
 
   @Post('graph/prediction/save')
   async savePrediction(@Body() data: any) {
-    return firstValueFrom(this.graphClient.send('graph.prediction.save', data));
+    return rpc(this.graphClient, 'graph.prediction.save', data);
   }
 
   // ============ VISUALIZATION ENDPOINTS ============
   @Get('visualization/graph-layout')
   async getGraphLayout() {
-    return firstValueFrom(this.visClient.send('visualization.layout', {}));
+    return rpc(this.visClient, 'visualization.layout', {});
   }
 
   @Post('visualization/filter')
   async filterGraph(@Body() { departments }: { departments: number[] }) {
-    return firstValueFrom(
-      this.visClient.send('visualization.filter', { departments }),
-    );
+    return rpc(this.visClient, 'visualization.filter', { departments });
   }
 
   @Post('visualization/export')
   async exportGraph(@Body() { format }: { format: 'json' | 'csv' }) {
-    return firstValueFrom(this.visClient.send('visualization.export', { format }));
+    return rpc(this.visClient, 'visualization.export', { format });
   }
 
   @Get('visualization/communities')
   async getCommunities() {
-    return firstValueFrom(this.visClient.send('visualization.communities', {}));
+    return rpc(this.visClient, 'visualization.communities', {});
   }
 
   // ============ ML SERVICE ENDPOINTS ============

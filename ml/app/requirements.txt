@@ -12,7 +12,7 @@ scikit-learn==1.4.2
 scipy==1.13.0
 
 # Graph Processing
-networkx==3.3
+networkx==2.8.8
 node2vec==0.4.6
 igraph==0.11.6
 python-louvain==0.16
